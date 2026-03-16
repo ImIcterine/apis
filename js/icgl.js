@@ -1,8 +1,9 @@
-// HOW TO ADD THIS TO YOUR SCRIPT
-// Add 'import * as icgl from "https://codeberg.org/ImIcterine/apis/raw/branch/main/js/icgl.js" to your JS file
+// HOW TO ADD TO YOUR SCRIPT
+// Add '<script src="https://cdn.jsdelivr.net/gh/ImIcterine/apis@main/js/icgl.js" defer></script>' to your HTML before your main script tag
 
 class GLDrawer {
     constructor(canvas) {
+        this.canvas = canvas
         this.gl = canvas.getContext("webgl")
 
         if (!this.gl) {
@@ -148,20 +149,38 @@ class GLDrawer {
             color
         )
     }
+
+    toGLCoords(x, y) {
+        const w = this.canvas.width
+        const h = this.canvas.height
+
+        const nx = x / (w / 2)
+        const ny = y / (h / 2)
+
+        return [nx, ny]
+    }
 }
 
-function toGLColors(hex = "", alpha = 0) {
+function toGLColors(hex = "", alpha = 1) {
     if (hex.length > 6) {
         hex = hex.slice(0, 6)
     }
+    
     if (hex.letters < 6) {
         hex = hex.padEnd(6, "0")
     }
-
-    return [
-        parseInt(hex.slice(0, 2), 16),
-        parseInt(hex.slice(2, 4), 16),
-        parseInt(hex.slice(4, 6), 16),
-        alpha
+    
+    const res = [
+        parseInt(hex.slice(0, 2), 16) / 255,
+        parseInt(hex.slice(2, 4), 16) / 255,
+        parseInt(hex.slice(4, 6), 16) / 255,
+        1 - alpha
     ]
+
+    return res
+}
+
+window.icgl = {
+    GLDrawer,
+    toGLColors
 }
